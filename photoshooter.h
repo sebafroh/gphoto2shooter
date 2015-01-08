@@ -40,16 +40,17 @@ public:
     PhotoShooter();
     ~PhotoShooter();
     bool loadFile(const QString &);
+    void resizeImage();
 
 private slots:
+    void normalSize();
+    void fitToWindow();
     void showCamera();
     void singleShot();
     void multipleShot();
     void selectFolder();
     void zoomIn();
     void zoomOut();
-    void normalSize();
-    void fitToWindow();
     void about();
 
 private:
