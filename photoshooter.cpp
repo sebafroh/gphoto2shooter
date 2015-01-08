@@ -4,19 +4,18 @@
 
 #include "photoshooter.h"
 
-/** Initialises the Threadthat does the taking of pictures
-*/
+/** Initializes the Thread takes the pictures */
 PhotoShooter::Shooter::Shooter(QObject* parentO, PhotoShooter* parent) : QThread(parentO),  parent(parent)
 {
 }
 
-/** Destroys the object*/
+/** Destroys the object */
 PhotoShooter::Shooter::~Shooter()
 {
     wait();
 }
 
-/** Takes a picture al X seconds */
+/** Takes a picture every X seconds */
 void PhotoShooter::Shooter::run() {
     while (parent->running) {
         for (int i = parent->timeintervall->value(); i > 1  && parent->running; --i) {
@@ -33,7 +32,7 @@ void PhotoShooter::Shooter::run() {
     }
 }
 
-/** Initialises the Program */
+/** Initializes the Program */
 PhotoShooter::PhotoShooter() : running(false)
 {
     QWidget* mainWidget = new QWidget();
@@ -90,14 +89,14 @@ PhotoShooter::PhotoShooter() : running(false)
     mydir = "~";
 }
 
-/**Destroys the Program data*/
+/** Destroys the Program data */
 PhotoShooter::~PhotoShooter()
 {
     shooter->terminate();
     delete shooter;
 }
 
-/** Loads a File from disk an shows it in the main Window*/
+/** Loads a File from disk an shows it in the main Window */
 bool PhotoShooter::loadFile(const QString& fileName)
 {
     QImage image(fileName);
@@ -123,7 +122,7 @@ bool PhotoShooter::loadFile(const QString& fileName)
     return true;
 }
 
-/**Toggles Mode to take multiple Pictures when Button is pressed*/
+/** Toggles Mode to take multiple Pictures when Button is pressed */
 void PhotoShooter::multipleShot()
 {
     running = !running;
@@ -137,7 +136,7 @@ void PhotoShooter::multipleShot()
     }
 }
 
-/**Takes one picture when Button is pressed*/
+/** Takes one picture when Button is pressed */
 void PhotoShooter::singleShot()
 {
     if ( takePicture() == 0) {
@@ -150,7 +149,7 @@ void PhotoShooter::singleShot()
     }
 }
 
-/** Takes one Picture*/
+/** Takes one Picture */
 int PhotoShooter::takePicture()
 {
     QString command;
@@ -170,7 +169,7 @@ int PhotoShooter::takePicture()
     return getData->exitCode();
 }
 
-/** Selects the Folder the Images are written to*/
+/** Selects the Folder the Images are written to */
 void PhotoShooter::selectFolder()
 {
     std::cout << "Folder!" <<std::endl;
@@ -188,7 +187,7 @@ void PhotoShooter::selectFolder()
 
 }
 
-/**Shows the Information gphoto2 shows about connected cameras*/
+/** Shows the Information gphoto2 shows about connected cameras */
 void PhotoShooter::showCamera()
 {
     QProcess* getData = new QProcess(this);
@@ -199,26 +198,26 @@ void PhotoShooter::showCamera()
                              result);
 }
 
-/**Zooms in to the picture*/
+/** Zooms in to the picture */
 void PhotoShooter::zoomIn()
 {
     scaleImage(1.25);
 }
 
-/**Zooms out of the picture*/
+/** Zooms out of the picture */
 void PhotoShooter::zoomOut()
 {
     scaleImage(0.8);
 }
 
-/** Sets zommfaktor to 1*/
+/** Sets zommfaktor to 1 */
 void PhotoShooter::normalSize()
 {
     imageLabel->adjustSize();
     scaleFactor = 1.0;
 }
 
-/**Scales the picture so it fits into the window*/
+/** Scales the picture so it fits into the window */
 void PhotoShooter::fitToWindow()
 {
     bool fitToWindow = fitToWindowAct->isChecked();
@@ -229,7 +228,7 @@ void PhotoShooter::fitToWindow()
     updateActions();
 }
 
-/**Shows a about-Message*/
+/** Shows a about-Message */
 void PhotoShooter::about()
 {
     QMessageBox::about(this, tr("About GPhoto2 Shooter"),
@@ -238,7 +237,7 @@ void PhotoShooter::about()
                           "Version 1.0 released by Sebastian Frohn &lt;unrath@unterderbruecke.de&gt; at 08.01.2015"));
 }
 
-/** Creates the Actions used by menu an buttons*/
+/** Creates the Actions used by menu an buttons */
 void PhotoShooter::createActions()
 {
 
@@ -292,7 +291,7 @@ void PhotoShooter::createActions()
 
 }
 
-/** Creates the menus*/
+/** Creates the menus */
 void PhotoShooter::createMenus()
 {
     fileMenu = new QMenu(tr("&File"), this);
@@ -321,7 +320,7 @@ void PhotoShooter::createMenus()
 }
 
 
-/**Toggles the zooming-Actions when fit-to-window-moode ist toggled*/
+/** Toggles the zooming-Actions when fit-to-window-moode ist toggled */
 void PhotoShooter::updateActions()
 {
     zoomInAct->setEnabled(!fitToWindowAct->isChecked());
@@ -329,7 +328,7 @@ void PhotoShooter::updateActions()
     normalSizeAct->setEnabled(!fitToWindowAct->isChecked());
 }
 
-/**scales the image*/
+/** scales the image */
 void PhotoShooter::scaleImage(double factor)
 {
     Q_ASSERT(imageLabel->pixmap());
@@ -343,13 +342,14 @@ void PhotoShooter::scaleImage(double factor)
     zoomOutAct->setEnabled(scaleFactor > 0.333);
 }
 
-/**Adjustes the scrollbar*/
+/** Adjustes the scrollbar */
 void PhotoShooter::adjustScrollBar(QScrollBar *scrollBar, double factor)
 {
     scrollBar->setValue(int(factor * scrollBar->value()
                             + ((factor - 1) * scrollBar->pageStep()/2)));
 }
 
+/** resizes the image to fit */
 void PhotoShooter::resizeImage()
 {
     scrollArea->setWidgetResizable(true);
