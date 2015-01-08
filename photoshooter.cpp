@@ -166,7 +166,13 @@ int PhotoShooter::takePicture()
     getData->start(command);
     getData->waitForFinished();
 
-    return getData->exitCode();
+
+    int returnvalue = getData->exitCode();
+
+    if ( returnvalue == 0)
+        loadFile(path);
+
+    return returnvalue;
 }
 
 /** Selects the Folder the Images are written to */
