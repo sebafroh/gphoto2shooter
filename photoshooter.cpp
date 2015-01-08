@@ -139,10 +139,7 @@ void PhotoShooter::multipleShot()
 /** Takes one picture when Button is pressed */
 void PhotoShooter::singleShot()
 {
-    if ( takePicture() == 0) {
-        loadFile(path);
-        cheese->setText(QString("Picture taken. Image saved to ").append(path));
-    } else {
+    if ( takePicture() != 0 ) {
         QMessageBox::information(this, QGuiApplication::applicationDisplayName(),
                                  tr("No camera found<br><br>Please check connection an make sure the camera is ready to take pictures<br><br>"));
         cheese->setText("Error taking Picture ");
@@ -153,6 +150,7 @@ void PhotoShooter::singleShot()
 int PhotoShooter::takePicture()
 {
     QString command;
+    QString path;
     QDateTime now = QDateTime::currentDateTime();
 
 
@@ -169,7 +167,7 @@ int PhotoShooter::takePicture()
 
     int returnvalue = getData->exitCode();
 
-    if ( returnvalue == 0)
+    if ( returnvalue == 0 )
         loadFile(path);
 
     return returnvalue;

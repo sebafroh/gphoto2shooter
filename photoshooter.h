@@ -67,7 +67,6 @@ private:
     bool running;
     Shooter* shooter;
     QString mydir;
-    QString path;
 
     QLabel* cheese;
     QSpinBox* timeintervall;
