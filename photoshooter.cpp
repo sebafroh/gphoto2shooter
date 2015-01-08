@@ -25,7 +25,11 @@ void PhotoShooter::Shooter::run() {
         }
         parent->cheese->setText("CHEESE!");
         sleep(1);
-        parent->takePicture();
+        if (parent->takePicture() != 0) {
+            parent->cheese->setText("Error taking a picture!!! Is Your Camera ready?");
+	    parent->multipleButton->setText("START");
+	    parent->running = false;
+        }
     }
 }
 
@@ -136,14 +140,19 @@ void PhotoShooter::multipleShot()
 /**Takes one picture when Button is pressed*/
 void PhotoShooter::singleShot()
 {
-    takePicture();
+    if ( takePicture() == 0) {
+        loadFile(path);
+        cheese->setText(QString("Picture taken. Image saved to ").append(path));
+    } else {
+        QMessageBox::information(this, QGuiApplication::applicationDisplayName(),
+                                 tr("No camera found<br><br>Please check connection an make sure the camera is ready to take pictures<br><br>"));
+        cheese->setText("Error taking Picture ");
+    }
 }
 
 /** Takes one Picture*/
 int PhotoShooter::takePicture()
 {
-
-    QString path;
     QString command;
     QDateTime now = QDateTime::currentDateTime();
 
@@ -158,18 +167,7 @@ int PhotoShooter::takePicture()
     getData->start(command);
     getData->waitForFinished();
 
-    int returnValue = getData->exitCode();
-
-    if ( returnValue == 0) {
-        loadFile(path);
-        cheese->setText(QString("Picture taken. Image saved to ").append(path));
-    } else {
-        QMessageBox::information(this, QGuiApplication::applicationDisplayName(),
-                                 tr("No camera found<br><br>Please check connection an make sure the camera is ready to take pictures<br><br>").append(getData->readAll()) );
-        cheese->setText("Error taking Picture ");
-    }
-
-    return returnValue;
+    return getData->exitCode();
 }
 
 /** Selects the Folder the Images are written to*/
@@ -237,7 +235,7 @@ void PhotoShooter::about()
     QMessageBox::about(this, tr("About GPhoto2 Shooter"),
                        tr("<p>The <b>GPhoto2 Shooter</b> is a simple programm to take several photos from a camera, saves them directly to the computer and shows the last taken picture on the screen.<br><br>"
                           "This may be usefull to take selfportraits or if you want to see the results imediately on your screen. Have Fun...<br><br>"
-			  "Version 1.0 released by Sebastian Frohn &lt;unrath@unterderbruecke.de&gt; at 08.01.2015"));
+                          "Version 1.0 released by Sebastian Frohn &lt;unrath@unterderbruecke.de&gt; at 08.01.2015"));
 }
 
 /** Creates the Actions used by menu an buttons*/
@@ -354,5 +352,5 @@ void PhotoShooter::adjustScrollBar(QScrollBar *scrollBar, double factor)
 
 void PhotoShooter::resizeImage()
 {
-  scrollArea->setWidgetResizable(true);
+    scrollArea->setWidgetResizable(true);
 }
