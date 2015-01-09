@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     QTranslator translator;
-    translator.load("photoshooter");
+    translator.load("photoshooter_de");
     app.installTranslator(&translator);
     QGuiApplication::setApplicationDisplayName(PhotoShooter::tr("GPhoto2 Shooter"));
     PhotoShooter photoshooter;

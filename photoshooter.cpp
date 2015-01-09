@@ -5,18 +5,18 @@
 #include "photoshooter.h"
 
 /** Initializes the Thread takes the pictures */
-PhotoShooter::Shooter::Shooter(QObject* parentO, PhotoShooter* parent) : QThread(parentO),  parent(parent)
+Shooter::Shooter(PhotoShooter* parent) : QThread(parent),  parent(parent)
 {
 }
 
 /** Destroys the object */
-PhotoShooter::Shooter::~Shooter()
+Shooter::~Shooter()
 {
     wait();
 }
 
 /** Takes a picture every X seconds */
-void PhotoShooter::Shooter::run() {
+void Shooter::run() {
     while (parent->running) {
         for (int i = parent->timeintervall->value(); i > 1  && parent->running; --i) {
             parent->setStautsbarText(tr("Time to next picture: %1 seconds").arg(QString::number(i)));
@@ -58,6 +58,7 @@ PhotoShooter::PhotoShooter() : running(false)
     statusbar->setAlignment(Qt::AlignCenter);
 
     timeintervall = new QSpinBox(this);
+    timeintervall->setSuffix(" s");
     timeintervall->setValue(5);
 
     QGridLayout *mainLayout = new QGridLayout;
@@ -69,8 +70,8 @@ PhotoShooter::PhotoShooter() : running(false)
     mainLayout->addWidget(timeintervall,       1, 4);
     mainLayout->setColumnStretch(0,4);
     mainLayout->setColumnStretch(1,4);
-    mainLayout->setColumnStretch(2,8);
-    mainLayout->setColumnStretch(3,2);
+    mainLayout->setColumnStretch(2,10);
+    mainLayout->setColumnStretch(3,1);
     mainLayout->setColumnStretch(4,1);
     mainWidget->setLayout(mainLayout);
 
@@ -81,7 +82,7 @@ PhotoShooter::PhotoShooter() : running(false)
 
     resize(QGuiApplication::primaryScreen()->availableSize() * 3 / 5);
 
-    shooter = new Shooter(this,this);
+    shooter = new Shooter(this);
 
     mydir = "~";
 }

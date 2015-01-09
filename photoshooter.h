@@ -17,24 +17,28 @@ class QLabel;
 class QMenu;
 class QScrollArea;
 class QScrollBar;
+class PhotoShooter;
+
+class Shooter: public QThread {
+    Q_OBJECT
+
+public:
+    Shooter(PhotoShooter* parent);
+    ~Shooter();
+
+protected:
+    void run() Q_DECL_OVERRIDE;
+
+private:
+    PhotoShooter* parent;
+
+};
 
 class PhotoShooter : public QMainWindow
 {
     Q_OBJECT
 
-    class Shooter: public QThread {
-
-    public:
-        Shooter(QObject* parentO, PhotoShooter* parent);
-        ~Shooter();
-
-    protected:
-        void run() Q_DECL_OVERRIDE;
-
-    private:
-        PhotoShooter* parent;
-
-    };
+friend class Shooter;
 
 public:
     PhotoShooter();

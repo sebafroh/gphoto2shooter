@@ -9,19 +9,16 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="photoshooter.cpp" line="22"/>
         <source>Time to next picture: %1 seconds</source>
-        <translation>Noch %1 sekunden bis zum nächsten Bild</translation>
+        <translation type="vanished">Noch %1 sekunden bis zum nächsten Bild</translation>
     </message>
     <message>
-        <location filename="photoshooter.cpp" line="25"/>
         <source>CHEESE!</source>
-        <translation>Lächeln !</translation>
+        <translation type="vanished">Lächeln !</translation>
     </message>
     <message>
-        <location filename="photoshooter.cpp" line="28"/>
         <source>Error taking a picture!!! Is Your Camera ready?</source>
-        <translation>Konnte kein Bild aufnehmen! Ist die Kamera einsatzbereit?</translation>
+        <translation type="vanished">Konnte kein Bild aufnehmen! Ist die Kamera einsatzbereit?</translation>
     </message>
     <message>
         <location filename="photoshooter.cpp" line="49"/>
@@ -29,7 +26,6 @@
         <translation>Einzelbild aufnehmen</translation>
     </message>
     <message>
-        <location filename="photoshooter.cpp" line="29"/>
         <location filename="photoshooter.cpp" line="52"/>
         <location filename="photoshooter.cpp" line="130"/>
         <source>START</source>
@@ -38,7 +34,7 @@
     <message>
         <location filename="photoshooter.cpp" line="55"/>
         <source>Time between pictures in s</source>
-        <translation>Zeit zwischen zwei Aufnahmen in Sekunden:</translation>
+        <translation>Zeitintervall</translation>
     </message>
     <message>
         <location filename="photoshooter.cpp" line="57"/>
@@ -197,6 +193,29 @@
         <location filename="photoshooter.cpp" line="317"/>
         <source>&amp;Help</source>
         <translation>Hilfe</translation>
+    </message>
+</context>
+<context>
+    <name>Shooter</name>
+    <message>
+        <location filename="photoshooter.cpp" line="22"/>
+        <source>Time to next picture: %1 seconds</source>
+        <translation>Noch %1 Sekunden bis zum nächsten Bild</translation>
+    </message>
+    <message>
+        <location filename="photoshooter.cpp" line="25"/>
+        <source>CHEESE!</source>
+        <translation>Lächeln !</translation>
+    </message>
+    <message>
+        <location filename="photoshooter.cpp" line="28"/>
+        <source>Error taking a picture!!! Is Your Camera ready?</source>
+        <translation>Konnte kein Bild aufnehmen! Ist die Kamera einsatzbereit?</translation>
+    </message>
+    <message>
+        <location filename="photoshooter.cpp" line="29"/>
+        <source>START</source>
+        <translation>Reihenaufnahme starten</translation>
     </message>
 </context>
 </TS>

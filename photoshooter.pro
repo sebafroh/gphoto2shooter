@@ -4,9 +4,9 @@ qtHaveModule(printsupport): QT += printsupport
 QMAKE_CXX = clang++
 QMAKE_LINK= clang++
 
-CONFIG += debug
+CONFIG += qt debug
 
-TRANSLATIONS = photoshooter.ts
+TRANSLATIONS = photoshooter_de.ts
 
 HEADERS       = photoshooter.h
 SOURCES       = photoshooter.cpp \
