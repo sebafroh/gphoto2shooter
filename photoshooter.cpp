@@ -19,14 +19,14 @@ PhotoShooter::Shooter::~Shooter()
 void PhotoShooter::Shooter::run() {
     while (parent->running) {
         for (int i = parent->timeintervall->value(); i > 1  && parent->running; --i) {
-            parent->cheese->setText(QString("Time to next picture: ").append(QString::number(i)).append(" seconds"));
+            parent->setStautsbarText(tr("Time to next picture: %1 seconds").arg(QString::number(i)));
             sleep(1);
         }
-        parent->cheese->setText("CHEESE!");
+        parent->statusbar->setText(tr("CHEESE!"));
         sleep(1);
         if (parent->takePicture() != 0) {
-            parent->cheese->setText("Error taking a picture!!! Is Your Camera ready?");
-	    parent->multipleButton->setText("START");
+            parent->setStautsbarText(tr("Error taking a picture!!! Is Your Camera ready?"));
+	    parent->multipleButton->setText(tr("START"));
 	    parent->running = false;
         }
     }
@@ -37,25 +37,25 @@ PhotoShooter::PhotoShooter() : running(false)
 {
     QWidget* mainWidget = new QWidget();
 
-    imageLabel = new QLabel;
+    imageLabel = new QLabel(this);
     imageLabel->setBackgroundRole(QPalette::Base);
     imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     imageLabel->setScaledContents(true);
 
-    scrollArea = new QScrollArea;
+    scrollArea = new QScrollArea(this);
     scrollArea->setBackgroundRole(QPalette::Dark);
     scrollArea->setWidget(imageLabel);
 
-    QPushButton* singleButton = new QPushButton("Take a single picture",this);
+    QPushButton* singleButton = new QPushButton(tr("Take a single picture"),this);
     connect(singleButton, SIGNAL(clicked()), this, SLOT(singleShot()));
 
-    multipleButton = new QPushButton("START",this);
+    multipleButton = new QPushButton(tr("START"),this);
     connect(multipleButton, SIGNAL(clicked()), this, SLOT(multipleShot()));
 
-    QLabel* tid = new QLabel("Time between pictures in s", this);
+    QLabel* tid = new QLabel(tr("Time between pictures in s"), this);
 
-    cheese = new QLabel("press start to begin taking pictures",this);
-    cheese->setAlignment(Qt::AlignCenter);
+    statusbar = new QLabel(tr("press start to begin taking pictures"),this);
+    statusbar->setAlignment(Qt::AlignCenter);
 
     timeintervall = new QSpinBox(this);
     timeintervall->setValue(5);
@@ -64,17 +64,14 @@ PhotoShooter::PhotoShooter() : running(false)
     mainLayout->addWidget(scrollArea,          0, 0, 1, 7);
     mainLayout->addWidget(singleButton,        1, 0);
     mainLayout->addWidget(multipleButton,      1, 1);
-    mainLayout->addWidget(cheese,              1, 2);
-    mainLayout->addItem(new QSpacerItem(1,1),  1, 3);
-    mainLayout->addWidget(tid,                 1, 4);
-    mainLayout->addItem(new QSpacerItem(1,1),  1, 5);
-    mainLayout->addWidget(timeintervall,       1, 6);
+    mainLayout->addWidget(statusbar,           1, 2);
+    mainLayout->addWidget(tid,                 1, 3);
+    mainLayout->addWidget(timeintervall,       1, 4);
     mainLayout->setColumnStretch(0,4);
     mainLayout->setColumnStretch(1,4);
     mainLayout->setColumnStretch(2,8);
     mainLayout->setColumnStretch(3,2);
-//     mainLayout->setColumnStretch(4,1);
-    mainLayout->setColumnStretch(6,1);
+    mainLayout->setColumnStretch(4,1);
     mainWidget->setLayout(mainLayout);
 
     setCentralWidget(mainWidget);
@@ -104,7 +101,7 @@ bool PhotoShooter::loadFile(const QString& fileName)
     if (image.isNull()) {
         QMessageBox::information(this, QGuiApplication::applicationDisplayName(),
                                  tr("Cannot load %1.").arg(QDir::toNativeSeparators(fileName)));
-        setWindowFilePath(QString());
+//         setWindowFilePath(QString());
         imageLabel->setPixmap(QPixmap());
         imageLabel->adjustSize();
         return false;
@@ -127,11 +124,11 @@ void PhotoShooter::multipleShot()
 {
     running = !running;
     if (running) {
-        multipleButton->setText("STOP");
+        multipleButton->setText(tr("STOP"));
         shooter->start();
     } else {
-        multipleButton->setText("START");
-        cheese->setText("press start to begin taking pictures");
+        multipleButton->setText(tr("START"));
+        statusbar->setText(tr("press start to begin taking pictures"));
         shooter->terminate();
     }
 }
@@ -142,7 +139,7 @@ void PhotoShooter::singleShot()
     if ( takePicture() != 0 ) {
         QMessageBox::information(this, QGuiApplication::applicationDisplayName(),
                                  tr("No camera found<br><br>Please check connection an make sure the camera is ready to take pictures<br><br>"));
-        cheese->setText("Error taking Picture ");
+        statusbar->setText(tr("Error taking Picture "));
     }
 }
 
@@ -158,7 +155,7 @@ int PhotoShooter::takePicture()
     command.append("gphoto2 --capture-image-and-download --filename ").append(path);
 
     std::cout << "Taking picture" << std::endl;
-    cheese->setText("Please wait while data will be transferred...");
+    statusbar->setText(tr("Please wait while data will be transferred..."));
 
     QProcess* getData = new QProcess(this);
     getData->start(command);
@@ -169,6 +166,8 @@ int PhotoShooter::takePicture()
 
     if ( returnvalue == 0 )
         loadFile(path);
+
+    delete getData;
 
     return returnvalue;
 }
@@ -342,8 +341,8 @@ void PhotoShooter::scaleImage(double factor)
     adjustScrollBar(scrollArea->horizontalScrollBar(), factor);
     adjustScrollBar(scrollArea->verticalScrollBar(), factor);
 
-    zoomInAct->setEnabled(scaleFactor < 3.0);
-    zoomOutAct->setEnabled(scaleFactor > 0.333);
+    zoomInAct->setEnabled(scaleFactor < 10.0);
+    zoomOutAct->setEnabled(scaleFactor > 0.1);
 }
 
 /** Adjustes the scrollbar */
@@ -357,4 +356,9 @@ void PhotoShooter::adjustScrollBar(QScrollBar *scrollBar, double factor)
 void PhotoShooter::resizeImage()
 {
     scrollArea->setWidgetResizable(true);
+}
+
+void PhotoShooter::setStautsbarText(QString txt)
+{
+  statusbar->setText(txt);
 }

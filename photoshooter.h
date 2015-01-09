@@ -60,6 +60,7 @@ private:
     void scaleImage(double factor);
     void adjustScrollBar(QScrollBar *scrollBar, double factor);
     int  takePicture();
+    void setStautsbarText(QString txt);
 
     QLabel *imageLabel;
     QScrollArea *scrollArea;
@@ -68,7 +69,7 @@ private:
     Shooter* shooter;
     QString mydir;
 
-    QLabel* cheese;
+    QLabel* statusbar;
     QSpinBox* timeintervall;
     QPushButton* multipleButton;
 

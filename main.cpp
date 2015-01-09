@@ -1,11 +1,14 @@
 #include <QApplication>
-
+#include <QTranslator>
 
 #include "photoshooter.h"
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+    QTranslator translator;
+    translator.load("photoshooter");
+    app.installTranslator(&translator);
     QGuiApplication::setApplicationDisplayName(PhotoShooter::tr("GPhoto2 Shooter"));
     PhotoShooter photoshooter;
     photoshooter.show();
