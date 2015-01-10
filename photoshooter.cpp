@@ -22,7 +22,8 @@ void Shooter::run() {
             parent->setStautsbarText(tr("Time to next picture: %1 seconds").arg(QString::number(i)));
             sleep(1);
         }
-        parent->statusbar->setText(tr("CHEESE!"));
+//         parent->statusbar->setText(tr("CHEESE!"));
+        parent->setStautsbarText(tr("CHEESE!"));
         sleep(1);
         if (parent->takePicture() != 0) {
             parent->setStautsbarText(tr("Error taking a picture!!! Is Your Camera ready?"));
@@ -290,7 +291,8 @@ void PhotoShooter::createActions()
     fitToWindowAct->setShortcut(tr("Ctrl+F"));
     connect(fitToWindowAct, SIGNAL(triggered()), this, SLOT(fitToWindow()));
 
-    aboutAct = new QAction(tr("&About"), this);
+    aboutAct = new QAction(tr("Abou&t"), this);
+    aboutAct->setShortcut(tr("Ctrl+T"));
     connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
 
 }
@@ -363,3 +365,4 @@ void PhotoShooter::setStautsbarText(QString txt)
 {
   statusbar->setText(txt);
 }
+
