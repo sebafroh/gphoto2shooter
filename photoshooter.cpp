@@ -18,17 +18,17 @@ Shooter::~Shooter()
 /** Takes a picture every X seconds */
 void Shooter::run() {
     while (parent->running) {
-        for (int i = parent->timeintervall->value(); i > 1  && parent->running; --i) {
-            parent->setStautsbarText(tr("Time to next picture: %1 seconds").arg(QString::number(i)));
+        for (int i = parent->timeintervall->value(); i > 0  && parent->running; --i) {
+            emit changeMessage(tr("Time to next picture: %1 seconds").arg(QString::number(i)));
             sleep(1);
         }
-//         parent->statusbar->setText(tr("CHEESE!"));
-        parent->setStautsbarText(tr("CHEESE!"));
-        sleep(1);
-        if (parent->takePicture() != 0) {
-            parent->setStautsbarText(tr("Error taking a picture!!! Is Your Camera ready?"));
-	    parent->multipleButton->setText(tr("START"));
-	    parent->running = false;
+        if (parent->running) {
+            emit changeMessage(tr("CHEESE"));
+            sleep(1);
+        }
+        if (parent->running) {
+            emit takePicture();
+            sleep(1);
         }
     }
 }
@@ -84,6 +84,8 @@ PhotoShooter::PhotoShooter() : running(false)
     resize(QGuiApplication::primaryScreen()->availableSize() * 3 / 5);
 
     shooter = new Shooter(this);
+    connect(shooter, SIGNAL(changeMessage(QString)), this, SLOT(setStatusbarText(QString)));
+    connect(shooter, SIGNAL(takePicture()),          this, SLOT(takePicture()));
 
     mydir = "~";
 }
@@ -121,6 +123,12 @@ bool PhotoShooter::loadFile(const QString& fileName)
     return true;
 }
 
+void PhotoShooter::setStatusbarText(QString message)
+{
+    statusbar->setText(message);
+}
+
+
 /** Toggles Mode to take multiple Pictures when Button is pressed */
 void PhotoShooter::multipleShot()
 {
@@ -139,9 +147,9 @@ void PhotoShooter::multipleShot()
 void PhotoShooter::singleShot()
 {
     if ( takePicture() != 0 ) {
+        statusbar->setText(tr("Error taking a picture!!! Is Your Camera ready?"));
         QMessageBox::information(this, QGuiApplication::applicationDisplayName(),
                                  tr("No camera found<br><br>Please check connection an make sure the camera is ready to take pictures<br><br>"));
-        statusbar->setText(tr("Error taking Picture "));
     }
 }
 
@@ -152,22 +160,26 @@ int PhotoShooter::takePicture()
     QString path;
     QDateTime now = QDateTime::currentDateTime();
 
+    statusbar->setText(tr("Please wait while data will be transferred..."));
 
     path.append(mydir).append("/img_").append(now.toString("yyyy.mm.dd_hh:mm:ss")).append(".JPG");
     command.append("gphoto2 --capture-image-and-download --filename ").append(path);
 
     std::cout << "Taking picture" << std::endl;
-    statusbar->setText(tr("Please wait while data will be transferred..."));
 
     QProcess* getData = new QProcess(this);
     getData->start(command);
     getData->waitForFinished();
 
-
     int returnvalue = getData->exitCode();
 
-    if ( returnvalue == 0 )
+    if ( returnvalue == 0 ) {
         loadFile(path);
+    } else {
+        statusbar->setText(tr("Error taking a picture!!! Is Your Camera ready?"));
+        multipleButton->setText(tr("START"));
+        running = false;
+    }
 
     delete getData;
 
@@ -360,9 +372,3 @@ void PhotoShooter::resizeImage()
 {
     scrollArea->setWidgetResizable(true);
 }
-
-void PhotoShooter::setStautsbarText(QString txt)
-{
-  statusbar->setText(txt);
-}
-

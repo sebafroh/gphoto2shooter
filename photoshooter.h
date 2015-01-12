@@ -26,6 +26,10 @@ public:
     Shooter(PhotoShooter* parent);
     ~Shooter();
 
+signals: 
+    void changeMessage(QString msg);
+    void takePicture();
+
 protected:
     void run() Q_DECL_OVERRIDE;
 
@@ -57,14 +61,15 @@ private slots:
     void zoomOut();
     void about();
 
+    void setStatusbarText(QString message);
+    int  takePicture();
+
 private:
     void createActions();
     void createMenus();
     void updateActions();
     void scaleImage(double factor);
     void adjustScrollBar(QScrollBar *scrollBar, double factor);
-    int  takePicture();
-    void setStautsbarText(QString txt);
 
     QLabel *imageLabel;
     QScrollArea *scrollArea;
