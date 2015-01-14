@@ -1,42 +1,12 @@
 #include <QtWidgets>
-#include <iostream>
 #include <unistd.h>
 
 #include "photoshooter.h"
 
-/** Initializes the Thread takes the pictures */
-Shooter::Shooter(PhotoShooter* parent) : QThread(parent),  parent(parent)
-{
-}
-
-/** Destroys the object */
-Shooter::~Shooter()
-{
-    wait();
-}
-
-/** Takes a picture every X seconds */
-void Shooter::run() {
-    while (parent->running) {
-        for (int i = parent->timeintervall->value(); i > 0  && parent->running; --i) {
-            emit changeMessage(tr("Time to next picture: %1 seconds").arg(QString::number(i)));
-            sleep(1);
-        }
-        if (parent->running) {
-            emit changeMessage(tr("CHEESE"));
-            sleep(1);
-        }
-        if (parent->running) {
-            emit takePicture();
-            sleep(1);
-        }
-    }
-}
-
 /** Initializes the Program */
-PhotoShooter::PhotoShooter() : running(false)
+PhotoShooter::PhotoShooter() : running(false), mydir("~")
 {
-    QWidget* mainWidget = new QWidget();
+    shooter = new Shooter(this);
 
     imageLabel = new QLabel(this);
     imageLabel->setBackgroundRole(QPalette::Base);
@@ -47,14 +17,10 @@ PhotoShooter::PhotoShooter() : running(false)
     scrollArea->setBackgroundRole(QPalette::Dark);
     scrollArea->setWidget(imageLabel);
 
-    QPushButton* singleButton = new QPushButton(tr("Take a single picture"),this);
-    connect(singleButton, SIGNAL(clicked()), this, SLOT(singleShot()));
-
+    singleButton   = new QPushButton(tr("Take a single picture"),this);
     multipleButton = new QPushButton(tr("START"),this);
-    connect(multipleButton, SIGNAL(clicked()), this, SLOT(multipleShot()));
 
-    QLabel* tid = new QLabel(tr("Time between pictures in s"), this);
-
+    tid       = new QLabel(tr("Time between pictures"),               this);
     statusbar = new QLabel(tr("press start to begin taking pictures"),this);
     statusbar->setAlignment(Qt::AlignCenter);
 
@@ -62,32 +28,16 @@ PhotoShooter::PhotoShooter() : running(false)
     timeintervall->setSuffix(" s");
     timeintervall->setValue(5);
 
-    QGridLayout *mainLayout = new QGridLayout;
-    mainLayout->addWidget(scrollArea,          0, 0, 1, 7);
-    mainLayout->addWidget(singleButton,        1, 0);
-    mainLayout->addWidget(multipleButton,      1, 1);
-    mainLayout->addWidget(statusbar,           1, 2);
-    mainLayout->addWidget(tid,                 1, 3);
-    mainLayout->addWidget(timeintervall,       1, 4);
-    mainLayout->setColumnStretch(0,4);
-    mainLayout->setColumnStretch(1,4);
-    mainLayout->setColumnStretch(2,10);
-    mainLayout->setColumnStretch(3,1);
-    mainLayout->setColumnStretch(4,1);
-    mainWidget->setLayout(mainLayout);
-
-    setCentralWidget(mainWidget);
-
+    createLayout();
     createActions();
     createMenus();
 
     resize(QGuiApplication::primaryScreen()->availableSize() * 3 / 5);
 
-    shooter = new Shooter(this);
-    connect(shooter, SIGNAL(changeMessage(QString)), this, SLOT(setStatusbarText(QString)));
-    connect(shooter, SIGNAL(takePicture()),          this, SLOT(takePicture()));
-
-    mydir = "~";
+    connect(singleButton,   SIGNAL(clicked()),              this, SLOT(singleShot()));
+    connect(multipleButton, SIGNAL(clicked()),              this, SLOT(multipleShot()));
+    connect(shooter,        SIGNAL(changeMessage(QString)), this, SLOT(setStatusbarText(QString)));
+    connect(shooter,        SIGNAL(takePicture()),          this, SLOT(takePicture()));
 }
 
 /** Destroys the Program data */
@@ -101,7 +51,6 @@ PhotoShooter::~PhotoShooter()
 bool PhotoShooter::loadFile(const QString& fileName)
 {
     QImage image(fileName);
-    std::cout << "Loading file: " << fileName.toStdString() << std::endl;
     if (image.isNull()) {
         QMessageBox::information(this, QGuiApplication::applicationDisplayName(),
                                  tr("Cannot load %1.").arg(QDir::toNativeSeparators(fileName)));
@@ -139,7 +88,7 @@ void PhotoShooter::multipleShot()
     } else {
         multipleButton->setText(tr("START"));
         statusbar->setText(tr("press start to begin taking pictures"));
-        shooter->terminate();
+        shooter->wait();
     }
 }
 
@@ -165,8 +114,6 @@ int PhotoShooter::takePicture()
     path.append(mydir).append("/img_").append(now.toString("yyyy.mm.dd_hh:mm:ss")).append(".JPG");
     command.append("gphoto2 --capture-image-and-download --filename ").append(path);
 
-    std::cout << "Taking picture" << std::endl;
-
     QProcess* getData = new QProcess(this);
     getData->start(command);
     getData->waitForFinished();
@@ -189,19 +136,14 @@ int PhotoShooter::takePicture()
 /** Selects the Folder the Images are written to */
 void PhotoShooter::selectFolder()
 {
-    std::cout << "Folder!" <<std::endl;
-
     QFileDialog dialog(this, tr("Open File"), QDir::currentPath());
 
     dialog.setFileMode(QFileDialog::Directory);
 
     if (dialog.exec() == QDialog::Accepted) {
-        std::cout << "Choosing folder " << dialog.selectedFiles().first().toStdString() << std::endl;
         mydir = dialog.selectedFiles().first();
+        statusbar->setText(tr("Choosing folder %1").arg(mydir));
     }
-    else
-        std::cout << "Esc" << std::endl;
-
 }
 
 /** Shows the Information gphoto2 shows about connected cameras */
@@ -253,6 +195,29 @@ void PhotoShooter::about()
                           "This may be usefull to take selfportraits or if you want to see the results imediately on your screen. Have Fun...<br><br>"
                           "Version 1.0 released by Sebastian Frohn &lt;unrath@unterderbruecke.de&gt; at 08.01.2015"));
 }
+
+void PhotoShooter::createLayout()
+{
+    QWidget* mainWidget = new QWidget();
+
+    QGridLayout *mainLayout = new QGridLayout;
+
+    mainLayout->addWidget(scrollArea,          0, 0, 1, 7);
+    mainLayout->addWidget(singleButton,        1, 0);
+    mainLayout->addWidget(multipleButton,      1, 1);
+    mainLayout->addWidget(statusbar,           1, 2);
+    mainLayout->addWidget(tid,                 1, 3);
+    mainLayout->addWidget(timeintervall,       1, 4);
+    mainLayout->setColumnStretch(0,4);
+    mainLayout->setColumnStretch(1,4);
+    mainLayout->setColumnStretch(2,10);
+    mainLayout->setColumnStretch(3,1);
+    mainLayout->setColumnStretch(4,1);
+
+    mainWidget->setLayout(mainLayout);
+    setCentralWidget(mainWidget);
+}
+
 
 /** Creates the Actions used by menu an buttons */
 void PhotoShooter::createActions()

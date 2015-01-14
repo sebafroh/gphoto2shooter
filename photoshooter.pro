@@ -1,19 +1,21 @@
 QT += widgets
 qtHaveModule(printsupport): QT += printsupport
 
-QMAKE_CXX = clang++
-QMAKE_LINK= clang++
+QMAKE_CXX  = clang++
+QMAKE_LINK = clang++
 
 CONFIG += qt debug
 
-TRANSLATIONS = photoshooter_de.ts
+TRANSLATIONS  = photoshooter_de.ts
 
-HEADERS       = photoshooter.h
+HEADERS       = photoshooter.h \
+		shooter.h
 SOURCES       = photoshooter.cpp \
+		shooter.cpp \
                 main.cpp
 
 # install
-target.path = $$[QT_INSTALL_EXAMPLES]/widgets/widgets/photoshooter
+target.path = /usr/bin/
 INSTALLS += target
 
 wince*: {

@@ -1,5 +1,5 @@
-#ifndef IMAGEVIEWER_H
-#define IMAGEVIEWER_H
+#ifndef PHOTOSHOOTER_H
+#define PHOTOSHOOTER_H
 
 #include <QMainWindow>
 
@@ -12,31 +12,14 @@
 #include <QProcess>
 #include <QByteArray>
 
+#include "shooter.h"
+
 class QAction;
 class QLabel;
 class QMenu;
 class QScrollArea;
 class QScrollBar;
 class PhotoShooter;
-
-class Shooter: public QThread {
-    Q_OBJECT
-
-public:
-    Shooter(PhotoShooter* parent);
-    ~Shooter();
-
-signals: 
-    void changeMessage(QString msg);
-    void takePicture();
-
-protected:
-    void run() Q_DECL_OVERRIDE;
-
-private:
-    PhotoShooter* parent;
-
-};
 
 class PhotoShooter : public QMainWindow
 {
@@ -65,6 +48,7 @@ private slots:
     int  takePicture();
 
 private:
+    void createLayout();
     void createActions();
     void createMenus();
     void updateActions();
@@ -78,9 +62,9 @@ private:
     Shooter* shooter;
     QString mydir;
 
-    QLabel* statusbar;
+    QLabel* statusbar, *tid;
     QSpinBox* timeintervall;
-    QPushButton* multipleButton;
+    QPushButton* multipleButton, *singleButton;
 
     QAction *exitAct;
     QAction *singleShotAct;
