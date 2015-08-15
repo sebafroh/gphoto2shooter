@@ -10,19 +10,19 @@ class PhotoShooter;
 class Shooter: public QThread {
     Q_OBJECT
 
-public:
-    Shooter(PhotoShooter* photoShooter);
+  public:
+    Shooter( PhotoShooter *photoShooter );
     ~Shooter();
 
-signals: 
-    void changeMessage(QString msg);
+  signals:
+    void changeMessage( QString msg );
     void takePicture();
 
-protected:
+  protected:
     void run() Q_DECL_OVERRIDE;
 
-private:
-    PhotoShooter* photoShooter;
+  private:
+    PhotoShooter *photoShooter;
 
 };
 

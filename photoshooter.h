@@ -21,19 +21,18 @@ class QScrollArea;
 class QScrollBar;
 class PhotoShooter;
 
-class PhotoShooter : public QMainWindow
-{
+class PhotoShooter : public QMainWindow {
     Q_OBJECT
 
-friend class Shooter;
+    friend class Shooter;
 
-public:
+  public:
     PhotoShooter();
     ~PhotoShooter();
-    bool loadFile(const QString &);
+    bool loadFile( const QString & );
     void resizeImage();
 
-private slots:
+  private slots:
     void normalSize();
     void fitToWindow();
     void showCamera();
@@ -44,27 +43,27 @@ private slots:
     void zoomOut();
     void about();
 
-    void setStatusbarText(QString message);
+    void setStatusbarText( QString message );
     int  takePicture();
 
-private:
+  private:
     void createLayout();
     void createActions();
     void createMenus();
     void updateActions();
-    void scaleImage(double factor);
-    void adjustScrollBar(QScrollBar *scrollBar, double factor);
+    void scaleImage( double factor );
+    void adjustScrollBar( QScrollBar *scrollBar, double factor );
 
     QLabel *imageLabel;
     QScrollArea *scrollArea;
     double scaleFactor;
     bool running;
-    Shooter* shooter;
+    Shooter *shooter;
     QString mydir;
 
-    QLabel* statusbar, *tid;
-    QSpinBox* timeintervall;
-    QPushButton* multipleButton, *singleButton;
+    QLabel *statusbar, *tid;
+    QSpinBox *timeintervall;
+    QPushButton *multipleButton, *singleButton;
 
     QAction *exitAct;
     QAction *singleShotAct;
